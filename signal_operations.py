@@ -10,7 +10,7 @@ def multipath_channel(x, n, delay_scale_list):
         output += pair[1] * x[index - pair[0]]
     return output
 
-def band_pass_filter(x, n1, n2):
+def band_pass_filter_OS(x, n1, n2):
     index1 = n1 - x[0][0]
     index2 = n2 - x[0][0]
     newx = []
@@ -18,7 +18,8 @@ def band_pass_filter(x, n1, n2):
         newx.append(x[i])
     return newx
 
-def low_pass_filter(x, n):
+def low_pass_filter_OS(x, n):
     return band_pass_filter(x, 0, n)
 
-
+def transfer_function(x, y):
+    
