@@ -23,6 +23,25 @@ def zero_pad(x, extra, side="right"):
         newx[1][:len(x.T)] = x[1]
     return newx
 
+def de_zero_pad(x, side="both"):
+    left_end = -1
+    right_end = len(x)
+    for i in range(0, len(x.T) - 1):
+        if x[i] == 0 and x[i + 1] != 0:
+            left_end = i
+            break
+    for j in range(len(x.T) - 1, 0, -1):
+        if x[j] == 0 and x[j - 1] != 0:
+            right_end = j
+            break
+    if side == "left":
+        return np.array([x[0][left_end + 1:], x[1][left_end + 1:]])
+    elif side == "right":
+        return np.array([x[0][:right_end], x[1][:right_end]])
+    else:
+        return np.array([x[0][left_end + 1:right_end], x[1][left_end + 1:right_end]])
+
+
 def combine(x1, x2):
     x1_first = x1[0][0]
     x2_first = x2[0][0]
@@ -38,8 +57,18 @@ def combine(x1, x2):
 def dft(x):
     return np.array([np.fft.fftshift(np.fft.fftfreq(len(x[0]), 1)), np.fft.fftshift(np.fft.fft(x[1]))])
 
+#init = [index, n]
+def ift(xhat, init = None):
+    N = len(xhat[0])
+    if init is None:
+        init = [0, N * xhat[0][0]]
+    time_domain = N * xhat[0] 
+    offset = init[1] - time_domain[init[0]]
+    time_domain += offset
+    return np.array([time_domain, np.fft.ifft(np.fft.ifftshift(xhat[1]))])
+
 #output length != input length
-def multipath_channel(x, delay_scale_list):
+def multipath_channel(x, delay_scale_list): 
     output = zero_pad(x, delay_scale_list.T[0].max())
     for pair in delay_scale_list:
         delayed_signal = np.zeros(len(output[1]))
