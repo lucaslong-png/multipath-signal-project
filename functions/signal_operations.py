@@ -3,14 +3,17 @@ import matplotlib.pyplot as plt
 import scipy.signal as signal
 
 #x = [time array, value array]
+
+#checked
 def periodic_extension(x, periods):
     N = len(x.T)
-    newx = x[0]
+    newx = x[0].tolist()
     for i in range(1, periods + 1):
-        newx = (np.array(newx) - N).toList() + newx + (np.array(newx) + N).toList()    
-    value_list = x[1].toList()
-    value_list = (2 * periods + 1) * xlist[1]
-    return np.array[np.array(newx), np.array(value_list)]
+        newx = (np.array(x[0]) - i * N).tolist() + newx + (np.array(x[0]) + i * N).tolist()
+    value_list = x[1].tolist()
+    value_list = (2 * periods + 1) * value_list
+    return np.array([np.array(newx), np.array(value_list)])
+
 
 def zero_pad(x, extra, side="right"):
     length = len(x.T) + extra
@@ -76,20 +79,6 @@ def multipath_channel(x, delay_scale_list):
         output[1] += delayed_signal * pair[1]
     return output
 
-def band_pass_filter(x, n1, n2):
-    newx = np.array([x[0], np.zeros(len(x.T))])
-    if (n1 > n2):
-        print("bounds out of order")
-        return
-    s = domain(x)
-    for i, item in enumerate(x[0]):
-        if abs(item) > n1 and abs(item) < n2:
-            newx[1][i] = x[1][i]    
-    return newx
-
-def low_pass_filter_OS(x, n):
-    return band_pass_filter(x, 0, n)
-
 def domain(x):
     return x[0]
 
@@ -117,3 +106,5 @@ def system_output(x, h):
 def tf_output(x, H):
     return np.fft.ifft(np.fft.fft(x) * H)
 
+def error(x, xt):
+    return sum((x[0] - xt[0])  ** 2)
