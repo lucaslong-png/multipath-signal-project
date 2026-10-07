@@ -5,7 +5,7 @@ import scipy.signal as signal
 
 #tested
 def periodic_extension(x, periods):
-    N = len(x.T)
+    N = len(x[0])
     newx = x[0].tolist()
     for i in range(1, periods + 1):
         newx = (np.array(x[0]) - i * N).tolist() + newx + (np.array(x[0]) + i * N).tolist()

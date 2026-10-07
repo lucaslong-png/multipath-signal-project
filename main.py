@@ -4,8 +4,8 @@ import scipy.signal as signal
 from functions import * 
 
 time = np.array([3, 4, 5, 6, 7])
-domain = np.array([5, 2, 3, 1, 6])
-xt = np.array([time, domain])
+values = np.array([5, 2, 3, 1, 6])
+xt = np.array([time, values])
 xz = np.array([time, np.zeros(5)])
 
 graphing.display(noise_interference.add_cosine_interference(xz, [[2, 5]]))
