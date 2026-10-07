@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.signal as signal
+from .signal_operations import *
 
 def display(x):
     plt.xlabel("time(n)")
@@ -8,8 +9,9 @@ def display(x):
     plt.plot(x[0],x[1])
     plt.show()
 
-def display_fourier(x):
+def display_fourier_magnitude(x):
+    xfft = signal_operations.dft(x)
     plt.xlabel("frequency(Ω)")
-    plt.ylabel("amplitude")
-    plt.plot(np.fft.fft(x),x[1] - x[0][0])
+    plt.ylabel("amplitude (magnitude)")
+    plt.plot(np.real(xfft[0]), np.abs(xfft[1]))
     plt.show()

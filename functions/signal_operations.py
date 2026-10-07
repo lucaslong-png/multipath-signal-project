@@ -4,7 +4,7 @@ import scipy.signal as signal
 
 #x = [time array, value array]
 
-#checked
+#tested
 def periodic_extension(x, periods):
     N = len(x.T)
     newx = x[0].tolist()
@@ -14,65 +14,82 @@ def periodic_extension(x, periods):
     value_list = (2 * periods + 1) * value_list
     return np.array([np.array(newx), np.array(value_list)])
 
-
+#tested
 def zero_pad(x, extra, side="right"):
     length = len(x.T) + extra
     newx = np.array([np.zeros(length), np.zeros(length)])
-    newx[0][:len(x.T)] = x[0]
-    newx[1][:len(x.T)] = x[1]
-    for i in range(len(x.T), length):
-        newx[0][i] = i + x[0][0]
-    if side == "left":
+    if side == "right":
         newx[1][:len(x.T)] = x[1]
+        newx[0][:len(x.T)] = x[0]
+        for i in range(len(x.T), length):
+            newx[0][i] = i + x[0][0]
+    elif side == "left":
+        newx[1][extra:] = x[1]
+        newx[0][extra:] = x[0]
+        for i in range(0, extra):
+            newx[0][i] = x[0][0] - extra + i
+    else:
+        print("neither right nor left called")
+        return x
     return newx
 
+#checked
 def de_zero_pad(x, side="both"):
     left_end = -1
     right_end = len(x)
-    for i in range(0, len(x.T) - 1):
-        if x[i] == 0 and x[i + 1] != 0:
+    for i in range(1, len(x.T)):
+        if x[1][i - 1] == 0 and x[1][i] != 0:
             left_end = i
             break
     for j in range(len(x.T) - 1, 0, -1):
-        if x[j] == 0 and x[j - 1] != 0:
+        if x[1][j] == 0 and x[1][j - 1] != 0:
             right_end = j
             break
     if side == "left":
-        return np.array([x[0][left_end + 1:], x[1][left_end + 1:]])
+        return np.array([x[0][left_end:], x[1][left_end:]])
     elif side == "right":
         return np.array([x[0][:right_end], x[1][:right_end]])
     else:
-        return np.array([x[0][left_end + 1:right_end], x[1][left_end + 1:right_end]])
+        return np.array([x[0][left_end:right_end], x[1][left_end:right_end]])
 
-
-def combine(x1, x2):
+#checked
+def align(x1, x2):
     x1_first = x1[0][0]
     x2_first = x2[0][0]
-    distance = abs(x2_first - x1_first)
     if (x1_first < x2_first):
-        x1 = zero_pad(x1, distance)
-        x2 = zero_pad(x2, distance, "left")
+        x2 = zero_pad(x2, int(x2_first - x1_first), "left")
     elif (x1_first > x2_first):
-        x2 = zero_pad(x2, distance)
-        x1 = zero_pad(x1, distance, "left")
+        x1 = zero_pad(x1, int(x1_first - x2_first), "left")
+    x1_last = x1[0][-1]
+    x2_last = x2[0][-1]
+    if (x1_last < x2_last):
+        x2 = zero_pad(x2, int(x2_last - x1_last))
+    elif (x1_last > x2_last):
+        x1 = zero_pad(x1, int(x1_last - x2_last))
+    return x1, x2
+
+def combine(x1, x2):
+    x1, x2 = align(x1, x2)
     return x1 + x2
 
+#checked
 def dft(x):
-    return np.array([np.fft.fftshift(np.fft.fftfreq(len(x[0]), 1)), np.fft.fftshift(np.fft.fft(x[1]))])
+    return np.array([2 * np.pi * np.fft.fftshift(np.fft.fftfreq(len(x[0]), 1)), np.fft.fftshift(np.fft.fft(x[1]))])
 
+#checked
 #init = [index, n]
 def ift(xhat, init = None):
     N = len(xhat[0])
     if init is None:
-        init = [0, N * xhat[0][0]]
-    time_domain = N * xhat[0] 
+        init = [0, N * xhat[0][0] / (2 * np.pi)]
+    time_domain = N * xhat[0] / (2 * np.pi) 
     offset = init[1] - time_domain[init[0]]
     time_domain += offset
     return np.array([time_domain, np.fft.ifft(np.fft.ifftshift(xhat[1]))])
 
 #output length != input length
 def multipath_channel(x, delay_scale_list): 
-    output = zero_pad(x, delay_scale_list.T[0].max())
+    output = zero_pad(x, int(delay_scale_list.T[0].max()))
     for pair in delay_scale_list:
         delayed_signal = np.zeros(len(output[1]))
         delayed_signal[pair[0]:(pair[0] + len(x[1]))] = x[1]
@@ -85,26 +102,27 @@ def domain(x):
 def sample_values(x):
     return x[1]
 
-def transfer_function(x, y):
-    xlen = len(x.T)
-    ylen = len(y.T)
-    if (xlen < ylen):
-        x = zero_pad(x, abs(xlen - ylen))
-    elif (xlen > ylen):
-        y = zero_pad(y, abs(xlen - ylen))
+def impulse_response(x, y):
+    x, y = align(x, y)
+    init = [0, x[0][0]]
     xfft = dft(x)
     yfft = dft(y)
-    newvalues = []
+    newvalues = np.zeros(len(xfft[0]))
     for i in range(0, len(x.T)):
-        newvalues.append(xfft[i]/yfft[i])
-    return np.array([xfft[0], newvalues])
+        newvalues[i] = (yfft[1][i]/xfft[1][i])
+    return ift(np.array([xfft[0], newvalues]), init)
 
-#need to fix
+def transfer_function(x, y):
+    return dft(impulse_response(x, y))
+
 def system_output(x, h):
-    return signal.convolve(x, h, method = 'auto')
+    x, h = align(x, h)
+    values = np.array(signal.convolve(x[1], h[1], method = 'auto'))
+    new_domain = np.arange(x[0][0], x[0][0] + len(values))
+    return np.array([new_domain, values])
 
 def tf_output(x, H):
-    return np.fft.ifft(np.fft.fft(x) * H)
+    return system_output(x, ift(H, [0, x[0][0]]))
 
 def error(x, xt):
-    return sum((x[0] - xt[0])  ** 2)
+    return sum((x[1] - xt[1])  ** 2)

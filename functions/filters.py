@@ -10,7 +10,7 @@ def band_pass_filter(x, n1, n2):
         return
     s = x[0]
     for i, item in enumerate(x[0]):
-        if abs(item) > n1 and abs(item) < n2:
+        if abs(item) >= n1 and abs(item) <= n2:
             newx[1][i] = x[1][i]    
     return newx
 
@@ -19,15 +19,15 @@ def low_pass_filter_OS(x, n):
 
 #y[n] = x[n-k]
 def delta_modulation(x, k):
-    return np.array(x[0] + k, x[1])
+    return np.array([x[0] + k, x[1]])
 
-#y[n] = x[n] + x[n-k]
+#y[n] = x[n] + ax[n-k]..
 def division_filter(y, delay_scale_list): 
     tf = 1
     init = [0, y[0][0]]
     yhat = dft(y)
     for pair in delay_scale_list:
-        tf += pair[1] * exp(1j * pair[0] * yhat[0]) 
+        tf += pair[1] * np.exp(-1j * pair[0] * yhat[0]) 
     xhat = np.array([yhat[0], yhat[1] / tf])
     x = ift(xhat, init)
     return x
