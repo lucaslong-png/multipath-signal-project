@@ -1,1 +1,1 @@
-__all__ = ["graphing", "signal_operations", "filters"]
+__all__ = ["graphing", "signal_operations", "filters", "noise_interference"]

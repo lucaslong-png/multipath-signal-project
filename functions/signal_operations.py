@@ -1,5 +1,4 @@
 import numpy as np
-import matplotlib.pyplot as plt
 import scipy.signal as signal
 
 #x = [time array, value array]
@@ -35,8 +34,8 @@ def zero_pad(x, extra, side="right"):
 
 #checked
 def de_zero_pad(x, side="both"):
-    left_end = -1
-    right_end = len(x)
+    left_end = 0
+    right_end = len(x[0])
     for i in range(1, len(x.T)):
         if x[1][i - 1] == 0 and x[1][i] != 0:
             left_end = i
