@@ -37,11 +37,11 @@ def de_zero_pad(x, side="both"):
     left_end = 0
     right_end = len(x[0])
     for i in range(1, len(x.T)):
-        if x[1][i - 1] == 0 and x[1][i] != 0:
+        if x[1][i] != 0:
             left_end = i
             break
     for j in range(len(x.T) - 1, 0, -1):
-        if x[1][j] == 0 and x[1][j - 1] != 0:
+        if x[1][j - 1] != 0:
             right_end = j
             break
     if side == "left":
@@ -51,7 +51,7 @@ def de_zero_pad(x, side="both"):
     else:
         return np.array([x[0][left_end:right_end], x[1][left_end:right_end]])
 
-#checked
+#tested
 def align(x1, x2):
     x1_first = x1[0][0]
     x2_first = x2[0][0]
@@ -62,14 +62,14 @@ def align(x1, x2):
     x1_last = x1[0][-1]
     x2_last = x2[0][-1]
     if (x1_last < x2_last):
-        x2 = zero_pad(x2, int(x2_last - x1_last))
+        x1 = zero_pad(x1, int(x2_last - x1_last))
     elif (x1_last > x2_last):
-        x1 = zero_pad(x1, int(x1_last - x2_last))
+        x2 = zero_pad(x2, int(x1_last - x2_last))
     return x1, x2
 
 def combine(x1, x2):
     x1, x2 = align(x1, x2)
-    return x1 + x2
+    return np.array([x1[0], x1[1] + x2[1]])
 
 #checked
 def dft(x):
