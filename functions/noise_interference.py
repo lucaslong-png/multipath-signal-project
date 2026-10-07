@@ -32,7 +32,7 @@ def add_impulse_noise(x, amp, prob):
                 x[1][i] -= amp
     return x
 
-def band_limited_noise(x):
+#def band_limited_noise(x):
 
 
 def add_cosine_interference(x, amp_freq_list):

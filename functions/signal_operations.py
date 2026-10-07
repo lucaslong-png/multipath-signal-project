@@ -32,7 +32,7 @@ def zero_pad(x, extra, side="right"):
         return x
     return newx
 
-#checked
+#tested
 def de_zero_pad(x, side="both"):
     left_end = 0
     right_end = len(x[0])
@@ -71,11 +71,11 @@ def combine(x1, x2):
     x1, x2 = align(x1, x2)
     return np.array([x1[0], x1[1] + x2[1]])
 
-#checked
+#tested
 def dft(x):
     return np.array([2 * np.pi * np.fft.fftshift(np.fft.fftfreq(len(x[0]), 1)), np.fft.fftshift(np.fft.fft(x[1]))])
 
-#checked
+#tested
 #init = [index, n]
 def ift(xhat, init = None):
     N = len(xhat[0])
@@ -84,7 +84,7 @@ def ift(xhat, init = None):
     time_domain = N * xhat[0] / (2 * np.pi) 
     offset = init[1] - time_domain[init[0]]
     time_domain += offset
-    return np.array([time_domain, np.fft.ifft(np.fft.ifftshift(xhat[1]))])
+    return np.array([time_domain, np.fft.ifft(np.fft.ifftshift(xhat[1]))]).real
 
 #output length != input length
 def multipath_channel(x, delay_scale_list): 
@@ -94,12 +94,6 @@ def multipath_channel(x, delay_scale_list):
         delayed_signal[pair[0]:(pair[0] + len(x[1]))] = x[1]
         output[1] += delayed_signal * pair[1]
     return output
-
-def domain(x):
-    return x[0]
-
-def sample_values(x):
-    return x[1]
 
 def impulse_response(x, y):
     x, y = align(x, y)
@@ -123,5 +117,7 @@ def system_output(x, h):
 def tf_output(x, H):
     return system_output(x, ift(H, [0, x[0][0]]))
 
-def error(x, xt):
-    return sum((x[1] - xt[1])  ** 2)
+#tested
+def ms_error(x1, x2):
+    x1, x2 = align(x1, x2)
+    return np.mean((x1[1] - x2[1])  ** 2)
