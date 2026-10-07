@@ -1,10 +1,11 @@
 import numpy as np
 import scipy.signal as signal
 from signal_operations import *
+from filters import *
 rng = np.random.default_rng()
 
 def zeros_array(length, start = 0):
-    x = np.array([np.array(length), np.zeros(length)])
+    x = np.array([np.zeros(length), np.zeros(length)])
     for i in range(length):
         x[0][i] = i + start
     return x
@@ -19,8 +20,10 @@ def add_colored_noise(x, amp = None, strength = 1):
     xhat = dft(x)
     init = [0, x[0][0]]
     if amp is None:
-        amp = np.mean(xhat[1])
-    xhat[1] += np.random.normal(0, amp, len(xhat[0])) / (x[0] ** strength)
+        amp = np.mean(abs(xhat[1])) / 8
+    for i in range(len(xhat[0])):
+        if xhat[0][i] != 0:
+            xhat[1][i] += rng.normal(0, amp) / abs(xhat[0][i]) ** (strength / 2)
     return ift(xhat, init)
 
 def add_impulse_noise(x, amp, prob):
@@ -32,8 +35,13 @@ def add_impulse_noise(x, amp, prob):
                 x[1][i] -= amp
     return x
 
-#def band_limited_noise(x):
-
+def band_limited_noise(x, w1, w2, sd = None):
+    if sd is None:
+        sd = np.std(x[1]) / 8  
+    noise = zeros_array(len(x[0]), x[0][0])
+    noise = add_WGN(noise, sd)
+    noise = band_pass_filter(noise, w1, w2)
+    return x + noise[1]
 
 def add_cosine_interference(x, amp_freq_list):
     xnew = x.copy()
