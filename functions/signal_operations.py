@@ -88,7 +88,7 @@ def ift(xhat, init = None):
 
 #output length != input length
 def multipath_channel(x, delay_scale_list): 
-    output = zero_pad(x, int(delay_scale_list.T[0].max()))
+    output = zero_pad(x, int(np.array(delay_scale_list).T[0].max()))
     for pair in delay_scale_list:
         delayed_signal = np.zeros(len(output[1]))
         delayed_signal[pair[0]:(pair[0] + len(x[1]))] = x[1]
@@ -120,4 +120,4 @@ def tf_output(x, H):
 #tested
 def ms_error(x1, x2):
     x1, x2 = align(x1, x2)
-    return np.mean((x1[1] - x2[1])  ** 2)
+    return np.mean((x1[1] - x2[1]) ** 2)
