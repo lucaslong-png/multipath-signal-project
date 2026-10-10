@@ -1,7 +1,7 @@
 import numpy as np
 import scipy.signal as signal
-from signal_operations import *
-from filters import *
+from .signal_operations import *
+from .filters import *
 rng = np.random.default_rng()
 
 def zeros_array(length, start):
@@ -11,7 +11,6 @@ def zeros_array(length, start):
     return x
 
 def WGN(length, start, sd = 1):
-    sd = 1
     x = zeros_array(length, start)
     x[1] = x[1] + rng.normal(0, sd, len(x[0]))
     return x
@@ -36,7 +35,7 @@ def impulse_noise(length, start, amp, prob):
 
 def band_limited_noise(length, start, w1, w2, sd = 1):
     x = WGN(length, start, sd)
-    x = band_pass_filter(noise, w1, w2)
+    x = band_pass_filter(x, w1, w2)
     return x
 
 def cosine_interference(length, start, amp_freq_list):
