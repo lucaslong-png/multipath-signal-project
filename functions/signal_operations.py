@@ -1,6 +1,6 @@
 import numpy as np
 import scipy.signal as signal
-
+from noise_interference import *
 #x = [time array, value array]
 
 #tested
@@ -40,7 +40,7 @@ def de_zero_pad(x, side="both"):
         if x[1][i] != 0:
             left_end = i
             break
-    for j in range(len(x.T) - 1, -1, -1):
+    for j in range(len(x.T), -1, -1):
         if x[1][j - 1] != 0:
             right_end = j
             break
@@ -71,6 +71,10 @@ def combine(x1, x2):
     x1, x2 = align(x1, x2)
     return np.array([x1[0], x1[1] + x2[1]])
 
+def multiply(x1, x2):
+    x1, x2 = align(x1, x2)
+    return np.array([x1[0], x1[1] * x2[1]])
+
 #tested
 def dft(x):
     return np.array([2 * np.pi * np.fft.fftshift(np.fft.fftfreq(len(x[0]), 1)), np.fft.fftshift(np.fft.fft(x[1]))], dtype = complex)
@@ -87,35 +91,46 @@ def ift(xhat, init = None):
     return np.array([time_domain.round(decimals = 0), np.fft.ifft(np.fft.ifftshift(xhat[1]))]).real
 
 #output length != input length
-def multipath_channel(x, delay_scale_list): 
-    output = zero_pad(x, int(np.array(delay_scale_list).T[0].max()))
+# def multipath_channel(x, delay_scale_list): 
+#     output = zero_pad(x, int(np.array(delay_scale_list).T[0].max()))
+#     for pair in delay_scale_list:
+#         delayed_signal = np.zeros(len(output[1]))
+#         delayed_signal[pair[0]:(pair[0] + len(x[1]))] = x[1]
+#         output[1] += delayed_signal * pair[1]
+#     return output
+
+def multipath_channel(n1, n2, spacing, delay_scale_list):
+    freq = domain(n1, n2, spacing)
+    length = len(freq)
+    values = np.ones(length, dtype = complex)
     for pair in delay_scale_list:
-        delayed_signal = np.zeros(len(output[1]))
-        delayed_signal[pair[0]:(pair[0] + len(x[1]))] = x[1]
-        output[1] += delayed_signal * pair[1]
-    return output
+        values += pair[1] * delta_modulation(n1, n2, spacing, pair[0])[1]
+    return np.array([freq, values])
+
+         
+
 
 #needs to fix
 #channel estimation?
-def impulse_response(x, y):
-    x, y = align(x, y)
-    init = [0, x[0][0]]
-    xfft = dft(x)
-    yfft = dft(y)
-    newvalues = np.zeros(len(xfft[0]), dtype = complex)
-    for i in range(0, len(x.T)):
-        newvalues[i] = (yfft[1][i]/xfft[1][i])
-    return ift(np.array([xfft[0], newvalues]), init)
+# def impulse_response(x, y):
+#     x, y = align(x, y)
+#     init = [0, x[0][0]]
+#     xfft = dft(x)
+#     yfft = dft(y)
+#     newvalues = np.zeros(len(xfft[0]), dtype = complex)
+#     for i in range(0, len(x.T)):
+#         newvalues[i] = (yfft[1][i]/xfft[1][i])
+#     return ift(np.array([xfft[0], newvalues]), init)
 
-def transfer_function(x, y):
-    return dft(impulse_response(x, y))
+# def transfer_function(x, y):
+#     return dft(impulse_response(x, y))
 
-#off by one
 def system_output(x, h):
     x, h = align(x, h)
     values = np.array(signal.convolve(x[1], h[1], method = 'auto'))
     new_domain = np.arange(x[0][0] + h[0][0], x[0][0] + h[0][0] + len(values))
     return de_zero_pad(np.array([new_domain, values]))
+
 
 #test
 # def system_output2(x, h):
@@ -130,16 +145,16 @@ def system_output(x, h):
     
 
 #must be aligned
-def tf_output(x, H):
-    #return system_output(x, ift(H, [0, x[0][0]]))
-    xhat = dft(x)
-    yhat = np.array([xhat[0], xhat[1] * H[1]])
-    return ift(yhat, [0, x[0][0]])
+def tf_output(x, H, init):
+    h = ift(H, init)
+    return system_output(x, h)
 
 #tested
 def ms_error(x1, x2):
     x1, x2 = align(x1, x2)
-    return np.mean((x1[1] - x2[1]) ** 2)
+    return np.mean(np.abs(x1[1] - x2[1]) ** 2)
 
-def PSD(x):
-    return mean(np.abs(x[1]) ** 2)
+def periodogram(xhat):
+    return np.mean(np.abs(xhat[1]) ** 2)
+
+#def PSD(xhat)

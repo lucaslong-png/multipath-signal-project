@@ -50,3 +50,5 @@ def add_IN(x, operations, parameters):
     for op, param in zip(operations, parameters):
         x[1] += op(*([length, start] + param))[1]
     return x
+
+#def noise_ESD()
