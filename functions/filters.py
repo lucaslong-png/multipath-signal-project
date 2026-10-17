@@ -8,51 +8,50 @@ def domain(n1, n2, spacing):
     end = n2 // spacing
     return np.arange(start, end + 1) * spacing
 
-def band_pass_filter(n1, n2, spacing = (2 * np.pi)):
+def band_pass_filter_tf(freq, n1, n2):
     if (n1 > n2):
         print("bounds out of order")
         return
-    if (n1 < 0):
-        if (n2 < 0):
-            temp = n2
-            n2 = -n1
-            n1 = -temp
-        else:
-            n1 = -n1
-    domainpos = domain(n1, n2, spacing)
-    length = len(domainpos)
-    domainneg = np.flip(domainpos) * -1
-    pos_filter = np.array([domainpos, np.ones(length)])
-    neg_filter = np.array([domainneg, np.ones(length)])
-    return combine(pos_filter, neg_filter)
-
-def low_pass_filter(n, spacing = (2 * np.pi)):
-    return band_pass_filter(0, n, spacing)
+    values = np.zeros(len(freq))
+    for i, sample in enumerate(freq):
+        if (n1 <= sample <= n2) or (-n2 <= sample <= -n1):
+            values[i] = 1
+    return np.array([freq, values])
+   
+def low_pass_filter_tf(freq, n):
+    return band_pass_filter_tf(freq, 0, n)
 
 #y[n] = x[n-k]
-def delta_modulation(n1, n2, spacing, k):
-    freq = domain(n1, n2, spacing)
-    values = np.exp(-1j * k * freq)
-    return np.array([freq, values])
+def scaled_delta_modulation(amp, delay):
+    values = np.zeros(delay + 1)
+    values[-1] = amp
+    return np.array([np.arange(delay + 1), values])
 
-#y[n] = x[n] + ax[n-k]..
-# def inverse_filter(n1, n2, spacing, delay_scale_list): 
-#     tf = 1
-#     init = [0, y[0][0]]
-#     yhat = dft(y)
-#     for pair in delay_scale_list:
-#         tf += pair[1] * np.exp(-1j * pair[0] * yhat[0]) 
-#     xhat = np.array([yhat[0], yhat[1] / tf])
-#     x = ift(xhat, init)
-#     return x
-
-def inverse_filter(n1, n2, spacing, delay_scale_list):
-    return 1 / multipath_channel(n1, n2, spacing, delay_scale_list)
+def inverse_filter_tf(freq, delay_scale_list):
+    length = len(freq)
+    values = np.ones(length, dtype = complex)
+    for pair in delay_scale_list:
+        values += pair[1] * np.exp(-1j * freq * pair[0])
+    return np.array([freq, 1 / values])
 
 #returns filter transfer function
-# def wiener_filter(x_PSD, noise_PSD, H):
-#     CPSD = H[1] * x_PSD[1] #1D
-#     APSD = abs(H[1]) ** 2 * xhat_PSD[1] + noise_PSD[1]
-#     return np.array([xhat[0], CPSD / APSD])
+def wiener_filter_tf(x, nPSD, H):
+    xPSD = PSD(x)
+    numerator = np.array([H[0], H[1].conj()])
+    denominator = np.array(H[0], np.abs(H[1]) ** 2 + divide(nPSD, xPSD))
+    return divide(numerator, denominator)
 
-def wiener_filter(n1, n2, spacing, noise_PSD):
+def apply(x, op, params, freq_length = None):
+    if freq_length is None:
+        freq_length = len(x[0])
+    if op.__name__.endswith("tf"):
+        x = zero_pad(x, freq_length - 1)
+        xhat = dft(x)
+        freq = xhat[0]
+        yhat = multiply(xhat, op(*([freq] + params)))
+        return de_zero_pad(ift(yhat, [0, x[0][0]]))
+    else:
+        return system_output(x, op(*params))
+            
+
+

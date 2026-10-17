@@ -1,6 +1,5 @@
 import numpy as np
 import scipy.signal as signal
-from noise_interference import *
 #x = [time array, value array]
 
 #tested
@@ -14,19 +13,21 @@ def periodic_extension(x, periods):
     return np.array([np.array(newx), np.array(value_list)])
 
 #tested
-def zero_pad(x, extra, side="right"):
+def zero_pad(x, extra, side="right", spacing=1):
+    if len(x[0]) > 1:
+        spacing = x[0][1] - x[0][0]
     length = len(x.T) + extra
-    newx = np.array([np.zeros(length), np.zeros(length)])
+    newx = np.array([np.zeros(length), np.zeros(length)])#, dtype = complex)
     if side == "right":
         newx[1][:len(x.T)] = x[1]
         newx[0][:len(x.T)] = x[0]
         for i in range(len(x.T), length):
-            newx[0][i] = i + x[0][0]
+            newx[0][i] = spacing * i + x[0][0]
     elif side == "left":
         newx[1][extra:] = x[1]
         newx[0][extra:] = x[0]
         for i in range(0, extra):
-            newx[0][i] = x[0][0] - extra + i
+            newx[0][i] = x[0][0] - (extra - i) * spacing
     else:
         print("neither right nor left called")
         return x
@@ -37,11 +38,11 @@ def de_zero_pad(x, side="both"):
     left_end = 0
     right_end = len(x[0])
     for i in range(0, len(x.T)):
-        if x[1][i] != 0:
+        if abs(x[1][i]) > (10 ** -5):
             left_end = i
             break
     for j in range(len(x.T), -1, -1):
-        if x[1][j - 1] != 0:
+        if abs(x[1][j - 1]) > (10 ** -5):
             right_end = j
             break
     if side == "left":
@@ -53,18 +54,22 @@ def de_zero_pad(x, side="both"):
 
 #tested
 def align(x1, x2):
+    if len(x2[0]) > len(x1[0]):
+        spacing = x2[0][1] - x2[0][0]
+    else:
+        spacing = x1[0][1] - x1[0][0]
     x1_first = x1[0][0]
     x2_first = x2[0][0]
     if (x1_first < x2_first):
-        x2 = zero_pad(x2, int(x2_first - x1_first), "left")
+        x2 = zero_pad(x2, int((x2_first - x1_first) / spacing), "left")
     elif (x1_first > x2_first):
-        x1 = zero_pad(x1, int(x1_first - x2_first), "left")
+        x1 = zero_pad(x1, int((x1_first - x2_first) / spacing), "left")
     x1_last = x1[0][-1]
     x2_last = x2[0][-1]
     if (x1_last < x2_last):
-        x1 = zero_pad(x1, int(x2_last - x1_last))
+        x1 = zero_pad(x1, int((x2_last - x1_last) / spacing))
     elif (x1_last > x2_last):
-        x2 = zero_pad(x2, int(x1_last - x2_last))
+        x2 = zero_pad(x2, int((x1_last - x2_last) / spacing))
     return x1, x2
 
 def combine(x1, x2):
@@ -74,6 +79,10 @@ def combine(x1, x2):
 def multiply(x1, x2):
     x1, x2 = align(x1, x2)
     return np.array([x1[0], x1[1] * x2[1]])
+
+def divide(x1, x2):
+    x1, x2 = align(x1, x2)
+    return np.array([x1[0], x1[1] / x2[1]])
 
 #tested
 def dft(x):
@@ -99,13 +108,17 @@ def ift(xhat, init = None):
 #         output[1] += delayed_signal * pair[1]
 #     return output
 
-def multipath_channel(n1, n2, spacing, delay_scale_list):
-    freq = domain(n1, n2, spacing)
-    length = len(freq)
-    values = np.ones(length, dtype = complex)
+#returns impulse response
+def multipath_channel(delay_scale_list):
+    if len(delay_scale_list) == 0:
+        return np.array([[0], [1]])
+    length = int(np.array(delay_scale_list).T[0].max()) + 1
+    domain = np.arange(0, length)
+    values = np.zeros(length)
+    values[0] = 1
     for pair in delay_scale_list:
-        values += pair[1] * delta_modulation(n1, n2, spacing, pair[0])[1]
-    return np.array([freq, values])
+        values[pair[0]] += pair[1]
+    return np.array([domain, values])
 
          
 
@@ -157,4 +170,14 @@ def ms_error(x1, x2):
 def periodogram(xhat):
     return np.mean(np.abs(xhat[1]) ** 2)
 
-#def PSD(xhat)
+#takes either time or frequency domain
+def PSD(x, domain = "time"):
+    if domain == "time":
+        xhat = dft(x)
+    elif domain == "freq":
+        xhat = x
+    else:
+        print("invalid domain")
+        return
+    return np.array([xhat[0], np.abs(xhat[1]) ** 2 / len(xhat[0])])
+    
