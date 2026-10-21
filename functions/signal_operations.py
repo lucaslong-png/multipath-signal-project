@@ -90,7 +90,7 @@ def dft(x):
 
 #tested
 #init = [index, n]
-def ift(xhat, init = None):
+def ift(xhat, init=None):
     N = len(xhat[0])
     if init is None:
         init = [0, N * xhat[0][0] / (2 * np.pi)]
@@ -120,9 +120,6 @@ def multipath_channel(delay_scale_list):
         values[pair[0]] += pair[1]
     return np.array([domain, values])
 
-         
-
-
 #needs to fix
 #channel estimation?
 # def impulse_response(x, y):
@@ -143,7 +140,6 @@ def system_output(x, h):
     values = np.array(signal.convolve(x[1], h[1], method = 'auto'))
     new_domain = np.arange(x[0][0] + h[0][0], x[0][0] + h[0][0] + len(values))
     return de_zero_pad(np.array([new_domain, values]))
-
 
 #test
 # def system_output2(x, h):
@@ -171,7 +167,7 @@ def periodogram(xhat):
     return np.mean(np.abs(xhat[1]) ** 2)
 
 #takes either time or frequency domain
-def PSD(x, domain = "time"):
+def PSD(x, domain="time"):
     if domain == "time":
         xhat = dft(x)
     elif domain == "freq":
