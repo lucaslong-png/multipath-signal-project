@@ -12,8 +12,15 @@ def periodic_extension(x, periods):
     value_list = (2 * periods + 1) * value_list
     return np.array([np.array(newx), np.array(value_list)])
 
+#implemented late, many functions have this built in already
+def spacing(x):
+    if len(x[0]) == 0 or len(x[0]) == 1:
+        print("length of 0 or 1")
+        return
+    return x[0][1] - x[0][0]
+
 #tested
-def zero_pad(x, extra, side="right", spacing=1):
+def zero_pad(x, extra, side="right", spacing=1.0):
     if len(x[0]) > 1:
         spacing = x[0][1] - x[0][0]
     length = len(x.T) + extra
@@ -58,6 +65,10 @@ def align(x1, x2):
         spacing = x2[0][1] - x2[0][0]
     else:
         spacing = x1[0][1] - x1[0][0]
+    if len(x2[0]) > 1 and len(x1[0]) > 1:
+        if abs((x2[0][1] - x2[0][0]) - (x1[0][1] - x1[0][0])) > (10 ** -5):
+            print("spacing incompatible - align")
+            return
     x1_first = x1[0][0]
     x2_first = x2[0][0]
     if (x1_first < x2_first):
@@ -167,13 +178,14 @@ def periodogram(xhat):
     return np.mean(np.abs(xhat[1]) ** 2)
 
 #takes either time or frequency domain
-def PSD(x, domain="time"):
+#zeropadding can only be done in time domain
+def PSD(x, extra = 0, domain="time"):
     if domain == "time":
-        xhat = dft(x)
+        xhat = dft(zero_pad(x, extra, "right", x[0][1] - x[0][0]))
     elif domain == "freq":
         xhat = x
     else:
         print("invalid domain")
         return
-    return np.array([xhat[0], np.abs(xhat[1]) ** 2 / len(xhat[0])])
+    return np.array([xhat[0], np.abs(xhat[1]) ** 2 / len(xhat[0])]).real
     

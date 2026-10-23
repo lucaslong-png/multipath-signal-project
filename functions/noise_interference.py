@@ -1,7 +1,6 @@
 import numpy as np
 import scipy.signal as signal
 from .signal_operations import *
-from .filters import *
 rng = np.random.default_rng()
 
 def zero_signal(length, start):
@@ -41,7 +40,9 @@ def impulse_noise(length, start, amp, prob):
 def band_limited_noise(length, start, w1, w2, sd=1):
     x = WGN(length, start, sd)
     xhat = dft(x)
-    xhat = multiply(band_pass_filter_tf(xhat[0], w1, w2), xhat)
+    for i, sample in enumerate(xhat[0]):
+        if not ((w1 <= sample <= w2) or (-w2 <= sample <= -w1)):
+            xhat[1][i] = 0
     return ift(xhat, [0, start])
 
 def cosine_interference(length, start, amp_freq_list):
@@ -50,13 +51,9 @@ def cosine_interference(length, start, amp_freq_list):
         x[1] += pair[0] * np.cos(pair[1] * x[0])
     return x   
 
-#probably needs revamp
-# def add_IN(x, operations, params):
-#     length = len(x[0])
-#     start = x[0][0]
-#     for op, param in zip(operations, params):
-#         x[1] += op(*([length, start] + param))[1]
-#     return x
+#params exclude length and start
+def noise_wrapper(length, start, operation, params):
+    return operation(*([length, start] + (params)))
 
 def noise_PSD(operation, params):
     temp = zero_signal(params[0], params[1])
@@ -82,5 +79,4 @@ def noise_PSD(operation, params):
     #elif operation == cosine_interference:
     return PSD.real
         
-
 
