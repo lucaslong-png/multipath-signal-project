@@ -110,15 +110,6 @@ def ift(xhat, init=None):
     time_domain += offset
     return np.array([time_domain.round(decimals = 0), np.fft.ifft(np.fft.ifftshift(xhat[1]))]).real
 
-#output length != input length
-# def multipath_channel(x, delay_scale_list): 
-#     output = zero_pad(x, int(np.array(delay_scale_list).T[0].max()))
-#     for pair in delay_scale_list:
-#         delayed_signal = np.zeros(len(output[1]))
-#         delayed_signal[pair[0]:(pair[0] + len(x[1]))] = x[1]
-#         output[1] += delayed_signal * pair[1]
-#     return output
-
 #returns impulse response
 def multipath_channel(delay_scale_list):
     if len(delay_scale_list) == 0:
