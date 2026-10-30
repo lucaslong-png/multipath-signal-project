@@ -9,34 +9,51 @@ from functions.advanced_filters import *
 
 rng = np.random.default_rng()
 start = 0
-end = 100000
+end = 10000
 length = end + 1 - start
 
 time1 = np.arange(start, end + 1)
 values1 = rng.uniform(low=0, high=100, size=length)
 
-noise_type = band_limited_noise
+noise_type = WGN
 system = multipath_channel
-sd = 10
+MSE_wf = []
+MSE_if = []
+MSE_bgd = []
+sd_values = np.arange(0, 110, 10)
 
-x1 = np.array([time1, values1])
-#print("x1: ", x1)
-dslist = [[2, 5], [3, 4], [5, 3]]
-system_params = [dslist]
-y1 = apply_with_noise(x1, system, system_params, noise_type, [0.5, 1.5, sd])
-# noise_params = [len(y1[0]), y1[0][0], 0.5, 1.5, sd]
-# wf_params = [x1, noise_type, noise_params, multipath_channel, system_params]
-# if_params = [dslist]
-# xnew1 = apply(y1, wiener_filter_tf, wf_params, 10)
-# xnew2 = apply(y1, inverse_filter_tf, if_params, 10)
-print("x1 last 10 samples: ", x1.T[length - 10:].T)
-# channel = LMS_channel_estimaion(x1, y1, 8)
-# print(channel)
+for sd in sd_values:
+    x1 = np.array([time1, values1])
+    #print("x1: ", x1)
+    dslist = [[2, 4], [5, -3], [7, 6], [11, 2], [14, -5]]    
+    system_params = [dslist]
+    y1 = apply_with_noise(x1, system, system_params, noise_type, [sd])
 
-reconstruction = LMS_equalization(multipath_channel(dslist), y1, length)
-# print("mean squared error 1: ", ms_error(xnew1, x1))
-# print("mean squared error 2: ", ms_error(xnew2, x1))
-print("signal last 10 samples: ", reconstruction.T[length - 10:].T)
-print("MSE: ", ms_error(x1, reconstruction))
-#print("normalized MSE: ", ms_error(xnew, x1) / np.mean(x1[1] ** 2))
-#display2(xnew1, xnew2)
+
+    reconstruction1 = LMS_equalization(multipath_channel(dslist), y1, length, 10000)
+    wf_params = [x1, noise_type, [sd], multipath_channel, system_params]
+    reconstruction2 = apply(y1, wiener_filter_tf, wf_params)
+    reconstruction3 = apply(y1, inverse_filter_tf, [dslist])
+    print("noise SD: ", sd)
+    wferror = ms_error(x1, reconstruction2)
+    iferror = ms_error(x1, reconstruction3)
+    bgderror = ms_error(x1, reconstruction1)
+    print("MSE (Wiener filter): ", wferror)
+    print("MSE (inverse filter): ", iferror)
+    print("MSE (batch gradient descent): ", bgderror)
+    MSE_wf.append(wferror)
+    MSE_if.append(iferror)
+    MSE_bgd.append(bgderror)
+
+plt.plot(sd_values, MSE_wf, marker = "o", label = "Wiener Filter")
+plt.plot(sd_values, MSE_if, marker = "o", label = "Inverse Filter")
+plt.plot(sd_values, MSE_bgd, marker = "o", label = "Batch Gradient Descent")
+
+plt.xlabel("Noise SD")
+plt.ylabel("Mean Squared Error")
+plt.title("MSE vs noise by filter type")
+plt.xlim(0, 100)
+plt.ylim(0, 300)
+plt.legend()
+plt.show()
+

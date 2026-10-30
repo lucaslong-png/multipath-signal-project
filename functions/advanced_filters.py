@@ -46,10 +46,10 @@ def LMS_channel_estimation(x, y, estimate_length):
 #     domain = np.arange(estimate_length)
 #     return de_zero_pad(np.array([domain, values]))
 
+
 #convolution based gradient descent
-def LMS_equalization(h, y, estimate_length, step_size = None, iterations = 10000):
-    if step_size == None:
-        step_size = 1e-3/(np.sum(h[1] ** 2))
+#returns the signal itself
+def LMS_equalization(h, y, estimate_length, iterations = 10000):
     estimate_domain = np.arange(y[0][0] - h[0][0], y[0][0] - h[0][0] + estimate_length)
     weights = np.zeros(estimate_length)
     if len(y[0]) < len(h[0]) + estimate_length:
@@ -62,9 +62,9 @@ def LMS_equalization(h, y, estimate_length, step_size = None, iterations = 10000
         error = target - ybar
         inputinv = np.flip(h[1])
         gradient = signal.convolve(error, inputinv, mode="valid", method="auto")
+        hg = signal.convolve(input, gradient, method="auto")
+        step_size = np.dot(hg, error) / np.sum(hg ** 2)
         weights = weights + step_size * gradient
-        #if i % 100 == 0:
-            #print(i, np.mean(error ** 2), np.max(np.abs(weights)))
     return np.array([estimate_domain, weights])
 
 #slow for large samples, non convolution based
@@ -74,8 +74,6 @@ def LMS_equalization(h, y, estimate_length, step_size = None, iterations = 10000
 #     domain = y[0][:estimate_length]
 #     return np.array([domain, values])
 
-
-
 def wiener_filter_tf(freq, x, noise_type, noise_params, system, system_params):
     if system.__name__.endswith("tf"):       
         H = system(*([freq] + system_params))
@@ -83,9 +81,9 @@ def wiener_filter_tf(freq, x, noise_type, noise_params, system, system_params):
         h = system(*system_params)
         H = dft(zero_pad(h, len(freq) - len(h[0])))
     xPSD = PSD(x, len(freq) - len(x[0]))
-    noise_params[0] = len(xPSD[0])
-    noise_params[1] = x[0][0]
-    nPSD = noise_PSD(noise_type, noise_params)
+    #noise_params[0] = len(xPSD[0])
+    #noise_params[1] = x[0][0]
+    nPSD = noise_PSD(noise_type, [len(xPSD[0]), x[0][0]] + noise_params)
     numerator = np.array([H[0], H[1].conj()])
     H_power = np.array([H[0], np.abs(H[1]) ** 2])
     denominator = combine(H_power, divide(nPSD, xPSD))
