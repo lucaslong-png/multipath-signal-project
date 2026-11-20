@@ -22,38 +22,41 @@ MSE_if = []
 MSE_bgd = []
 sd_values = np.arange(0, 110, 10)
 
+dslist = [[2, 4], [5, -3], [7, 6], [11, 2], [14, -5]]    
+x1 = np.array([time1, values1])
+y = apply(x1, multipath_channel, [dslist])
+
+
 for sd in sd_values:
-    x1 = np.array([time1, values1])
-    #print("x1: ", x1)
-    dslist = [[2, 4], [5, -3], [7, 6], [11, 2], [14, -5]]    
     system_params = [dslist]
-    y1 = apply_with_noise(x1, system, system_params, noise_type, [sd])
+    noise_params = [sd]
+    y1 = apply_with_noise(x1, system, system_params, noise_type, noise_params)
 
 
-    reconstruction1 = LMS_equalization(multipath_channel(dslist), y1, length, 10000)
-    wf_params = [x1, noise_type, [sd], multipath_channel, system_params]
+
+    reconstruction1 = LMS_equalization(multipath_channel(dslist), y1, length, 1000)
+    wf_params = [x1, noise_type, noise_params, multipath_channel, system_params]
     reconstruction2 = apply(y1, wiener_filter_tf, wf_params)
     reconstruction3 = apply(y1, inverse_filter_tf, [dslist])
     print("noise SD: ", sd)
-    wferror = ms_error(x1, reconstruction2)
-    iferror = ms_error(x1, reconstruction3)
-    bgderror = ms_error(x1, reconstruction1)
-    print("MSE (Wiener filter): ", wferror)
-    print("MSE (inverse filter): ", iferror)
-    print("MSE (batch gradient descent): ", bgderror)
-    MSE_wf.append(wferror)
-    MSE_if.append(iferror)
-    MSE_bgd.append(bgderror)
+    wferrorin = total_error(x1, reconstruction2)
+    iferrorin = total_error(x1, reconstruction3)
+    bgderrorin = total_error(x1, reconstruction1)
+    print("input error: ")
+    print("error (Wiener filter): ", wferrorin)
+    print("error (inverse filter): ", iferrorin)
+    print("error (batch gradient descent): ", bgderrorin)
 
-plt.plot(sd_values, MSE_wf, marker = "o", label = "Wiener Filter")
-plt.plot(sd_values, MSE_if, marker = "o", label = "Inverse Filter")
-plt.plot(sd_values, MSE_bgd, marker = "o", label = "Batch Gradient Descent")
+    wferrorout = total_error(y, apply(reconstruction2, multipath_channel, system_params))
+    iferrorout = total_error(y, apply(reconstruction3, multipath_channel, system_params))
+    bgderrorout = total_error(y, apply(reconstruction1, multipath_channel, system_params))
+    print("output error: ")
+    print("error (Wiener filter): ", wferrorout)
+    print("error (inverse filter): ", iferrorout)
+    print("error (batch gradient descent): ", bgderrorout)
 
-plt.xlabel("Noise SD")
-plt.ylabel("Mean Squared Error")
-plt.title("MSE vs noise by filter type")
-plt.xlim(0, 100)
-plt.ylim(0, 300)
-plt.legend()
-plt.show()
+
+
+                                                      
+
 

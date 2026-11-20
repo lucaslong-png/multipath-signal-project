@@ -165,6 +165,10 @@ def ms_error(x1, x2):
     x1, x2 = align(x1, x2)
     return np.mean(np.abs(x1[1] - x2[1]) ** 2)
 
+def total_error(x1, x2):
+    x1, x2 = align(x1, x2)
+    return np.sum(np.abs(x1[1] - x2[1]) ** 2)
+
 def periodogram(xhat):
     return np.mean(np.abs(xhat[1]) ** 2)
 

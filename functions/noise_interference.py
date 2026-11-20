@@ -57,26 +57,27 @@ def noise_wrapper(length, start, operation, params):
 
 def noise_PSD(operation, params):
     temp = zero_signal(params[0], params[1])
-    PSD = dft(temp)
+    psd = dft(temp)
     if operation == WGN:
-        PSD[1] = params[2] ** 2
+        psd[1] = params[2] ** 2
     elif operation == colored_noise:
         if len(params) == 2:
             params = np.append(params, 1)
         if len(params) == 3:
             params = np.append(params, 1)
-        for i, freq in enumerate(PSD[0]):
+        for i, freq in enumerate(psd[0]):
             if freq != 0:
-                PSD[1][i] = params[2] ** 2 / abs(PSD[0][i]) ** params[3]
+                psd[1][i] = params[2] ** 2 / abs(psd[0][i]) ** params[3]
     elif operation == impulse_noise:
-        PSD[1] = params[3] * params[2] ** 2
+        psd[1] = params[3] * params[2] ** 2
     elif operation == band_limited_noise:
         if len(params) == 4:
             params = np.append(params, 1)
-        for i, freq in enumerate(PSD[0]):
+        for i, freq in enumerate(psd[0]):
             if (params[2] <= freq <= params[3]) or (-params[3] <= freq <= -params[2]):
-                PSD[1][i] = params[4] ** 2
-    #elif operation == cosine_interference:
-    return PSD.real
+                psd[1][i] = params[4] ** 2
+    elif operation == cosine_interference:
+        psd[1] = PSD(cosine_interference(*params))[1]
+    return psd.real
         
 
