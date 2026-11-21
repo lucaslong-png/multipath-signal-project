@@ -95,7 +95,7 @@ $$
 Let this be $J(F)$. Expanding the expected value, we get
 
 $$
-J(F) = E[|FY - X|^{2}] = E[(FY - X)(FY - X)^{*}] = |F|^{2}E[|Y|^{2}] - FE[X^{*}Y] - F^{*}E[XY^{*}] + E[|X|^{2}]
+J(F) = E[|FY - X|^{2}] = E[(FY - X)(FY - X)^{\ast}] = |F|^{2}E[|Y|^{2}] - FE[X^{\ast}Y] - F^{*}E[XY^{\ast}] + E[|X|^{2}]
 $$
 
 For simplicity, we define the power spectral densities:
