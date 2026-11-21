@@ -41,7 +41,7 @@ By the convolution theorem. However, when taking the DFT instead of the DTFT, th
 In my project I add noise/interference to the output of the system to simulate a real life environment, meaning that the new input-output relationships become:
 
 $$
-y = h * x + i \text{ and } Y = HX + I
+y = h \ast x + i \text{ and } Y = HX + I
 $$
 
 My goal is to find a filter F such that $\hat{x}$ = $\mathcal{F}^{-1}\{FY\}$ minimizes the following sum: 
@@ -71,7 +71,7 @@ This filter, while somewhat effective in channels with low noise, does not have 
 The mathematically optimal filter given enough information is the Wiener filter, defined as 
 
 $$
-F = \frac{H^{*}S_{xx}}{|H|^{2}S_{xx}+S_{ii}}
+F = \frac{H^{\ast}S_{xx}}{|H|^{2}S_{xx}+S_{ii}}
 $$
 
 Where $S_{xx} = E[|X(e^{j\Omega})|^{2}]$ indicates the power spectral density (PSD) of a signal. What this means is discussed later. To derive this, we start with our goal: We want to minimize 
@@ -95,28 +95,28 @@ $$
 Let this be $J(F)$. Expanding the expected value, we get
 
 $$
-J(F) = E[|FY - X|^{2}] = E[(FY - X)(FY - X)^{*}] = |F|^{2}E[|Y|^{2}] - FE[X^{*}Y] - F^{*}E[XY^{*}] + E[|X|^{2}]
+J(F) = E[|FY - X|^{2}] = E[(FY - X)(FY - X)^{\ast}] = |F|^{2}E[|Y|^{2}] - FE[X^{\ast}Y] - F^{\ast}E[XY^{\ast}] + E[|X|^{2}]
 $$
 
 For simplicity, we define the power spectral densities:
 
 $$
-S_{xx} = E[|X|^{2}],\ S_{yy} = E[|Y|^{2}],\ S_{xy} = E[XY^{*}]
+S_{xx} = E[|X|^{2}],\ S_{yy} = E[|Y|^{2}],\ S_{xy} = E[XY^{\ast}]
 $$
 
 S_{xx} and S_{yy} are a measure of where power is distributed among the signal, while S_{xy} is a measure of correlation (or an inner product). Because F is independent of the expected value, this turns into
 
 $$
-J = |F|^{2}S_{yy} - F^{*}S_{xy} - FS_{xy}^{*} + S_{xx}
+J = |F|^{2}S_{yy} - F^{\ast}S_{xy} - FS_{xy}^{\ast} + S_{xx}
 $$
 
 The filter F can be broken down into a complex number a + bi. To find the minimum of J, we differentiate with respect to each complex component and set the derivatives equal to 0:
 
 $$
 \begin{gathered}
-J = (a^{2} + b^{2})S_{yy} - (a - bi)S_{xy}^{*} - (a + bi)S_{xy} + S_{xx}\\
-\frac{\partial J}{\partial a} = 2aS_{yy} - S_{xy}^{*} - S_{xy} = 0\\
-\frac{\partial J}{\partial b} = 2bS_{yy} + iS_{xy}^{*} - i S_{xy} = 0
+J = (a^{2} + b^{2})S_{yy} - (a - bi)S_{xy}^{\ast} - (a + bi)S_{xy} + S_{xx}\\
+\frac{\partial J}{\partial a} = 2aS_{yy} - S_{xy}^{\ast} - S_{xy} = 0\\
+\frac{\partial J}{\partial b} = 2bS_{yy} + iS_{xy}^{\ast} - i S_{xy} = 0
 \end{gathered}
 $$
 
@@ -133,20 +133,20 @@ $$
 This is a valid stopping point, as both $S_{xy}$ and $S_{yy}$ can be estimated from provided information. However, estimating S_{xy} uses information about the PSD of x, and so we can simplify this expression by solving for $S_{xy}$: 
 
 $$
-S_{xy} = E[XY^{*}] = E[X(H^{*}X^{*} + I^{*})] = E[H^{*}|X|^{2}] + E[XI^{*}]
+S_{xy} = E[XY^{\ast}] = E[X(H^{\ast}X^{\ast} + I^{\ast})] = E[H^{\ast}|X|^{2}] + E[XI^{\ast}]
 $$
 
-Because the noise is assumed to be completely independent of the signal, $E[XI^{*}] = 0$. Because $H$ is independent of the expected value, $E[H^{*}|X|^{2}] = H^{*}E[|X|^{2}] = H^{*}S_{xx}$. Therefore, the filter F can be expressed as:
+Because the noise is assumed to be completely independent of the signal, $E[XI^{\ast}] = 0$. Because $H$ is independent of the expected value, $E[H^{\ast}|X|^{2}] = H^{\ast}E[|X|^{2}] = H^{\ast}S_{xx}$. Therefore, the filter F can be expressed as:
 
 $$
-F = \frac{H^{*}S_{xx}}{S_{yy}}
+F = \frac{H^{\ast}S_{xx}}{S_{yy}}
 $$
 
 But since $S_{xy}$ is expressed in terms of the input, we might as well express $S_{yy}$ in terms of the input also:
 
 $$
 \begin{gathered}
-S_{yy} = E[|Y|^{2}] = E[(HX + I)(HX + I)^{*}] = |H|^{2}E[|X|^{2}] + HE[XI^{*}] + H^{*}E[X^{*}I] + E[|I|^{2}]\\
+S_{yy} = E[|Y|^{2}] = E[(HX + I)(HX + I)^{\ast}] = |H|^{2}E[|X|^{2}] + HE[XI^{\ast}] + H^{\ast}E[X^{\ast}I] + E[|I|^{2}]\\
 = |H|^{2}S_{xx} + S_{ii}
 \end{gathered}
 $$
@@ -154,7 +154,7 @@ $$
 Where $S_{ii} = E[|I|^{2}]$ is similarly the PSD of the noise. Therefore, our final expression for the Wiener filter is:
 
 $$
-F = \frac{H^{*}S_{xx}}{|H|^{2}S_{xx} + S_{ii}}
+F = \frac{H^{\ast}S_{xx}}{|H|^{2}S_{xx} + S_{ii}}
 $$
 
 To achieve optimal accuracy I would need both the signal PSD and the noise PSD. The noise PSD can generally be estimated with statistical knowledge of the noise, but estimating the signal PSD is difficult without knowledge of the signal. In my simulation I pass the exact signal PSD so that I can test the accuracy of my other filters against the true least squares solution.
