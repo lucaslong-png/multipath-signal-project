@@ -2,6 +2,7 @@
 Discrete time (DT) signals are functions of a discrete time domain. As opposed to a continuous time (CT) domain, a DT domain has a finite amount of points between 2 existing points. For example, there are *exactly* 3 points between 1 and 5 in DT using standard integer indexing. 
 
 The *discrete time* fourier transform (DTFT) of a DT signal is defined as 
+
 $$
 X(e^{j\Omega}) = \sum_{n} x[n]e^{-jn\Omega} 
 $$
@@ -32,7 +33,7 @@ The DFT assumes finite domain or periodic signals, so some problems related to t
 A system is essentially an operator that takes an input x to an output y, while a filter is a type of system that is designed to extract something (i.e. recover x from y). These operators can be represented with a time domain function h (impulse response) or its fourier transform, a frequency domain function H (transfer function). The time domain and frequency domain input-output relationships for LTI systems are:
 
 $$
-y = h ∗ x \text{ and } Y = HX
+y = h * x \text{ and } Y = HX
 $$
 
 By the convolution theorem. However, when taking the DFT instead of the DTFT, the convolution theorem applies for *circular* (wrap around) convolution instead of *linear* convolution. One way to circumvent this for signals that diminish over time ($\lim_{n \to \infty} x[n] = 0$) is to *zero pad* the representation, or extend the domain by adding trailing zeros. Because I am modeling finite aperiodic signals with an infinite domain, this does nothing to the accuracy of the representation, but it reduces the overlap produced from the signal's tail. This means that for finite signals it is always possible to zero pad to exactly match linear convolution while for infinite but decreasing signals I can get a better and better approximation by zero padding. <br>
@@ -40,7 +41,7 @@ By the convolution theorem. However, when taking the DFT instead of the DTFT, th
 In my project I add noise/interference to the output of the system to simulate a real life environment, meaning that the new input-output relationships become:
 
 $$
-y = h ∗ x + i \text{ and } Y = HX + I
+y = h * x + i \text{ and } Y = HX + I
 $$
 
 My goal is to find a filter F such that $\hat{x}$ = $\mathcal{F}^{-1}\{FY\}$ minimizes the following sum: 
@@ -54,9 +55,11 @@ Under various circumstances.
 # Current implemented filters <br> 
 
 The most direct filter for my project and the first filter I implemented is the inverse filter. This filter is simply the reciprocal of the transfer function; that is, 
+
 $$F = \frac{1}{H}$$ 
 and 
 $$\hat{x} = \mathcal{F}^{-1}\{X + \frac{I}{H}\}$$
+
 This filter, while somewhat effective in channels with low noise, does not have any built-in method to counteract noise. In fact, at spots where the transfer function H is close to 0, this filter can drastically amplify noise. This leads to the next filter, which has a built in mechanism to counteract noise. <br>
 
 The mathematically optimal filter given enough information is the Wiener filter, defined as 
@@ -104,16 +107,21 @@ $$
 The filter F can be broken down into a complex number a + bi. To find the minimum of J, we differentiate with respect to each complex component and set the derivatives equal to 0:
 
 $$
+\begin{gathered}
 J = (a^{2} + b^{2})S_{yy} - (a - bi)S_{xy}^{*} - (a + bi)S_{xy} + S_{xx}\\
 \frac{\partial J}{\partial a} = 2aS_{yy} - S_{xy}^{*} - S_{xy} = 0\\
 \frac{\partial J}{\partial b} = 2bS_{yy} + iS_{xy}^{*} - i S_{xy} = 0
+\end{gathered}
 $$
 
 Now, solving for a, b, and F, we get:
+
 $$
+\begin{gathered}
 a = \frac{Re(S_{xy})}{S_{yy}}\\
 b = \frac{Im(S_{xy})}{S_{yy}}\\
 F = a + bi = \frac{S_{xy}}{S_{yy}}
+\end{gathered}
 $$
 
 This is a valid stopping point, as both $S_{xy}$ and $S_{yy}$ can be estimated from provided information. However, estimating S_{xy} uses information about the PSD of x, and so we can simplify this expression by solving for $S_{xy}$: 
@@ -131,8 +139,10 @@ $$
 But since $S_{xy}$ is expressed in terms of the input, we might as well express $S_{yy}$ in terms of the input also:
 
 $$
+\begin{gathered}
 S_{yy} = E[|Y|^{2}] = E[(HX + I)(HX + I)^{*}] = |H|^{2}E[|X|^{2}] + HE[XI^{*}] + H^{*}E[X^{*}I] + E[|I|^{2}]\\
 = |H|^{2}S_{xx} + S_{ii}
+\end{gathered}
 $$
 
 Where $S_{ii} = E[|I|^{2}]$ is similarly the PSD of the noise. Therefore, our final expression for the Wiener filter is:
