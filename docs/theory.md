@@ -142,7 +142,7 @@ F = a + bi = \frac{S_{xy}}{S_{yy}}
 \end{gathered}
 $$
 
-This is a valid stopping point, as both $S_{xy}$ and $S_{yy}$ can be estimated from provided information. However, estimating S_{xy} uses information about the PSD of x, and so we can simplify this expression by solving for $S_{xy}$: 
+This is a valid stopping point, as both $S_{xy}$ and $S_{yy}$ can be estimated from provided information. However, estimating $S_{xy}$ uses information about the PSD of x, and so we can simplify this expression by solving for $S_{xy}$: 
 
 $$
 S_{xy} = E[XY^{\ast}] = E[X(H^{\ast}X^{\ast} + I^{\ast})] = E[H^{\ast}\left|X\right|^{2}] + E[XI^{\ast}]

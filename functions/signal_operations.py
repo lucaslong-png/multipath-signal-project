@@ -185,5 +185,7 @@ def PSD(x, extra = 0, domain="time"):
     return np.array([xhat[0], np.abs(xhat[1]) ** 2 / len(xhat[0])]).real
 
 def truncate(x, length):
+    if len(x[0] == length):
+        return x
     return x.T[:length].T
     
