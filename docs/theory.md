@@ -1,4 +1,4 @@
-# Discrete time signals and fourier representations <br> <br>
+# Discrete time signals and fourier representations <br> 
 Discrete time (DT) signals are functions of a discrete time domain. As opposed to a continuous time (CT) domain, a DT domain has a finite amount of points between 2 existing points. For example, there are *exactly* 3 points between 1 and 5 in DT using standard integer indexing. 
 
 The *discrete time* fourier transform (DTFT) of a DT signal is defined as 
@@ -28,7 +28,7 @@ $$
 
 The DFT assumes finite domain or periodic signals, so some problems related to the convolution theorem arise later that make implementation more complicated in discrete time.
 
-# Systems, filters, and convolution <br> <br>
+# Systems, filters, and convolution <br> 
 A system is essentially an operator that takes an input x to an output y, while a filter is a type of system that is designed to extract something (i.e. recover x from y). These operators can be represented with a time domain function h (impulse response) or its fourier transform, a frequency domain function H (transfer function). The time domain and frequency domain input-output relationships for LTI systems are:
 
 $$
@@ -51,7 +51,7 @@ $$
 
 Under various circumstances. 
 
-# Current implemented filters <br> <br>
+# Current implemented filters <br> 
 
 The most direct filter for my project and the first filter I implemented is the inverse filter. This filter is simply the reciprocal of the transfer function; that is, 
 $$F = \frac{1}{H}$$ 
@@ -86,7 +86,7 @@ $$
 Let this be $J(F)$. Expanding the expected value, we get
 
 $$
-J(F) = E[|FY - X|^{2}] = E[(FY - X)(FY - X)^{*}] = |F|^{2}E[|Y|^{2}] - FE[X^{*}Y] - F^{*}E[XY^{*}] + E[|X|^{2}] 
+J(F) = E[|FY - X|^{2}] = E[(FY - X)(FY - X)^{*}] = |F|^{2}E[|Y|^{2}] - FE[X^{*}Y] - F^{*}E[XY^{*}] + E[|X|^{2}]
 $$
 
 For simplicity, we define the power spectral densities:
