@@ -7,7 +7,7 @@ $$
 X(e^{j\Omega}) = \sum_{n} x[n]e^{-jn\Omega} 
 $$
 
-where j is the imaginary unit and $\Omega$ is a *continuous* real variable in the domain $\left[-\pi, \pi\right)$ representing frequency. The fourier transform input is written as $e^{j\Omega}$ to indicate $2\pi$ periodicity and evaluation on the unit circle in the complex plane. The inverse DTFT is defined as
+where j is the imaginary unit and $\Omega$ is a *continuous* real variable in the domain $\left(-\pi, \pi\right)$ representing frequency. The fourier transform input is written as $e^{j\Omega}$ to indicate $2\pi$ periodicity and evaluation on the unit circle in the complex plane. The inverse DTFT is defined as
 
 $$
 x[n] = \frac{1}{2\pi}\int_{T} X(e^{j\Omega})e^{jn\Omega} d\Omega
