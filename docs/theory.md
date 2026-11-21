@@ -83,31 +83,31 @@ $$
 Dividng by the sample length N and applying Parseval's theorem, this is equivalent to minimizing
 
 $$
-\frac{1}{N}\sum_{n} |FY - X|^{2} 
+\frac{1}{N}\sum_{n} \left|FY - X\right|^{2} 
 $$
 
 This expression is equivalent to minimizing the expected value of the squared differences across multiple signals X:
 
 $$
-E[|FY - X|^{2}]
+E[\left|FY - X\right|^{2}]
 $$
 
 Let this be $J(F)$. Expanding the expected value, we get
 
 $$
-J(F) = E[|FY - X|^{2}] = E[(FY - X)(FY - X)^{\ast}] = |F|^{2}E[|Y|^{2}] - FE[X^{\ast}Y] - F^{\ast}E[XY^{\ast}] + E[|X|^{2}]
+J(F) = E[\left|FY - X\right|^{2}] = E[(FY - X)(FY - X)^{\ast}] = \left|F\right|^{2}E[\left|Y\right|^{2}] - FE[X^{\ast}Y] - F^{\ast}E[XY^{\ast}] + E[\left|X\right|^{2}]
 $$
 
 For simplicity, we define the power spectral densities:
 
 $$
-S_{xx} = E[|X|^{2}],\ S_{yy} = E[|Y|^{2}],\ S_{xy} = E[XY^{\ast}]
+S_{xx} = E[\left|X\right|^{2}],\ S_{yy} = E[\left|Y\right|^{2}],\ S_{xy} = E[XY^{\ast}]
 $$
 
 S_{xx} and S_{yy} are a measure of where power is distributed among the signal, while S_{xy} is a measure of correlation (or an inner product). Because F is independent of the expected value, this turns into
 
 $$
-J = |F|^{2}S_{yy} - F^{\ast}S_{xy} - FS_{xy}^{\ast} + S_{xx}
+J = \left|F\right|^{2}S_{yy} - F^{\ast}S_{xy} - FS_{xy}^{\ast} + S_{xx}
 $$
 
 The filter F can be broken down into a complex number a + bi. To find the minimum of J, we differentiate with respect to each complex component and set the derivatives equal to 0:
@@ -133,10 +133,10 @@ $$
 This is a valid stopping point, as both $S_{xy}$ and $S_{yy}$ can be estimated from provided information. However, estimating S_{xy} uses information about the PSD of x, and so we can simplify this expression by solving for $S_{xy}$: 
 
 $$
-S_{xy} = E[XY^{\ast}] = E[X(H^{\ast}X^{\ast} + I^{\ast})] = E[H^{\ast}|X|^{2}] + E[XI^{\ast}]
+S_{xy} = E[XY^{\ast}] = E[X(H^{\ast}X^{\ast} + I^{\ast})] = E[H^{\ast}\left|X\right|^{2}] + E[XI^{\ast}]
 $$
 
-Because the noise is assumed to be completely independent of the signal, $E[XI^{\ast}] = 0$. Because $H$ is independent of the expected value, $E[H^{\ast}|X|^{2}] = H^{\ast}E[|X|^{2}] = H^{\ast}S_{xx}$. Therefore, the filter F can be expressed as:
+Because the noise is assumed to be completely independent of the signal, $E[XI^{\ast}] = 0$. Because $H$ is independent of the expected value, $E[H^{\ast}|X|^{2}] = H^{\ast}E[\left|X\right|^{2}] = H^{\ast}S_{xx}$. Therefore, the filter F can be expressed as:
 
 $$
 F = \frac{H^{\ast}S_{xx}}{S_{yy}}
@@ -146,15 +146,15 @@ But since $S_{xy}$ is expressed in terms of the input, we might as well express 
 
 $$
 \begin{gathered}
-S_{yy} = E[|Y|^{2}] = E[(HX + I)(HX + I)^{\ast}] = |H|^{2}E[|X|^{2}] + HE[XI^{\ast}] + H^{\ast}E[X^{\ast}I] + E[|I|^{2}]\\
-= |H|^{2}S_{xx} + S_{ii}
+S_{yy} = E[\left|Y\right|^{2}] = E[(HX + I)(HX + I)^{\ast}] = \left|H\right|^{2}E[\left|X\right|^{2}] + HE[XI^{\ast}] + H^{\ast}E[X^{\ast}I] + E[\left|I\right|^{2}]\\
+= \left|H\right|^{2}S_{xx} + S_{ii}
 \end{gathered}
 $$
 
-Where $S_{ii} = E[|I|^{2}]$ is similarly the PSD of the noise. Therefore, our final expression for the Wiener filter is:
+Where $S_{ii} = E[\left|I\right|^{2}]$ is similarly the PSD of the noise. Therefore, our final expression for the Wiener filter is:
 
 $$
-F = \frac{H^{\ast}S_{xx}}{|H|^{2}S_{xx} + S_{ii}}
+F = \frac{H^{\ast}S_{xx}}{\left|H\right|^{2}S_{xx} + S_{ii}}
 $$
 
 To achieve optimal accuracy I would need both the signal PSD and the noise PSD. The noise PSD can generally be estimated with statistical knowledge of the noise, but estimating the signal PSD is difficult without knowledge of the signal. In my simulation I pass the exact signal PSD so that I can test the accuracy of my other filters against the true least squares solution.
