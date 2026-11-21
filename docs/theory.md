@@ -56,9 +56,15 @@ Under various circumstances.
 
 The most direct filter for my project and the first filter I implemented is the inverse filter. This filter is simply the reciprocal of the transfer function; that is, 
 
-$$F = \frac{1}{H}$$ 
+$$
+F = \frac{1}{H}
+$$
+
 and 
-$$\hat{x} = \mathcal{F}^{-1}\{X + \frac{I}{H}\}$$
+
+$$
+\hat{x} = \mathcal{F}^{-1}\{X + \frac{I}{H}\}
+$$
 
 This filter, while somewhat effective in channels with low noise, does not have any built-in method to counteract noise. In fact, at spots where the transfer function H is close to 0, this filter can drastically amplify noise. This leads to the next filter, which has a built in mechanism to counteract noise. <br>
 
