@@ -10,7 +10,7 @@ $$
 where j is the imaginary unit and $\Omega$ is a *continuous* real variable in the domain $\left[-\pi, \pi\right)$ representing frequency. The fourier transform input is written as $e^{j\Omega}$ to indicate $2\pi$ periodicity and evaluation on the unit circle in the complex plane. The inverse DTFT is defined as
 
 $$
-x[n] = \frac{1}{2\pi}\int_{T} X(e^{j\Omega})e^{jn\Omega} d\Omega
+x[n] = \frac{1}{2\pi}\int_{T = 2\pi} X(e^{j\Omega})e^{jn\Omega} d\Omega
 $$
 
 The fourier transform has many useful properties, but its primary role is simply to convert signals to the frequency domain, where many operations become much easier. One example is convolution; by the convolution theorem, convolution in time corresponds to multiplication in frequency:
@@ -24,7 +24,7 @@ $$
 One problem arising with this representation is that I am using a discrete variable n and a continuous variable $\Omega$. This can be circumvented by using the *discrete* fourier transform (DFT) instead of the *discrete time* fourier transform. This essentially samples the frequency grid at N equally spaced points, where N is the DT domain size. This means that $\Omega$ is now a discrete variable indexed at spacing $\frac{2\pi}{N}$ instead of a continuous variable, and the inverse DFT is defined as
 
 $$
-x[n] = \frac{1}{N}\sum_{k} X[k]e^\frac{jkn}{2\pi} 
+x[n] = \frac{1}{N}\sum_{k} X[k]e^\frac{j2\pi kn}{N} 
 $$
 
 Where $\Omega = \frac{2\pi k}{N}$.  The DFT assumes finite domain or periodic signals, so some problems related to the convolution theorem arise later that make implementation more complicated in discrete time.
@@ -44,10 +44,10 @@ $$
 y = h \ast x + i \text{ and } Y = HX + I
 $$
 
-My goal is to find a filter F such that $\hat{x}$ = $\mathcal{F}^{-1}\lbrace FY\rbrace$ minimizes the following sum: 
+My goal is to find a filter $F$ such that $\hat{x}$ = $\mathcal{F}^{-1}\lbrace FY\rbrace$ minimizes the following sum: 
 
 $$
-\sum_{n} \left|\hat{x} - x\right|^{2}
+\sum_{n} \left|\hat{x}[n] - x[n]\right|^{2}
 $$
 
 Under various circumstances. 
@@ -74,16 +74,16 @@ $$
 F = \frac{H^{\ast}S_{xx}}{\left|H\right|^{2}S_{xx}+S_{ii}}
 $$
 
-Where $S_{xx} = E[\left|X(e^{j\Omega})\right|^{2}]$ indicates the power spectral density (PSD) of a signal. What this means is discussed later. To derive this, we start with our goal: We want to minimize 
+Where $S_{xx} = E[\left|X\right|^{2}]$ indicates the power spectral density (PSD) of a signal. What this means is discussed later. To derive this, we start with our goal: We want to minimize 
 
 $$
 \sum_{n} \left|\hat{x}[n] - x[n]\right|^{2}
 $$
 
-Dividng by the sample length N and applying Parseval's theorem, this is equivalent to minimizing
+Dividng by the sample length $N$ and applying Parseval's theorem, this is equivalent to minimizing
 
 $$
-\frac{1}{N}\sum_{n} \left|FY - X\right|^{2} 
+\frac{1}{N}\sum_{k} \left|FY - X\right|^{2} 
 $$
 
 This expression is equivalent to minimizing the expected value of the squared differences across multiple signals X:
@@ -104,13 +104,13 @@ $$
 S_{xx} = E[\left|X\right|^{2}],\ S_{yy} = E[\left|Y\right|^{2}],\ S_{xy} = E[XY^{\ast}]
 $$
 
-S_{xx} and S_{yy} are a measure of where power is distributed among the signal, while S_{xy} is a measure of correlation (or an inner product). Because F is independent of the expected value, this turns into
+$S_{xx}$ and $S_{yy}$ are a measure of where power is distributed among the signal, while $S_{xy}$ is a measure of correlation (or an inner product). Because F is independent of the expected value, this turns into
 
 $$
 J = \left|F\right|^{2}S_{yy} - F^{\ast}S_{xy} - FS_{xy}^{\ast} + S_{xx}
 $$
 
-The filter F can be broken down into a complex number a + bi. To find the minimum of J, we differentiate with respect to each complex component and set the derivatives equal to 0:
+The filter $F$ can be broken down into a complex number $a + bi$. To find the minimum of $J$, we differentiate with respect to each complex component and set the derivatives equal to 0:
 
 $$
 \begin{gathered}
@@ -120,7 +120,7 @@ J = (a^{2} + b^{2})S_{yy} - (a - bi)S_{xy}^{\ast} - (a + bi)S_{xy} + S_{xx}\\
 \end{gathered}
 $$
 
-Now, solving for a, b, and F, we get:
+Now, solving for $a$, $b$, and $F$, we get:
 
 $$
 \begin{gathered}
