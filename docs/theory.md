@@ -66,7 +66,19 @@ $$
 \hat{x} = \mathcal{F}^{-1}\lbrace X + \frac{I}{H}\rbrace
 $$
 
-This filter, while somewhat effective in channels with low noise, does not have any built-in method to counteract noise. In fact, at spots where the transfer function H is close to 0, this filter can drastically amplify noise. This leads to the next filter, which has a built in mechanism to counteract noise. <br>
+Because the inverse DFT is linear, this turns into
+
+$$
+\hat{x} - x = \mathcal{F}^{-1}\lbrace \frac{I}{H}\rbrace
+$$
+
+Taking the squared magnitude of the sum over all indices and applying Parseval's theorem, this gives
+
+$$
+\sum_{n} \left|\hat{x}[n] - x[n]\right|^{2} = \frac{1}{N}\sum_{k} \left| \frac{I}{H} \right|^{2}
+$$
+
+In other words, the total error is equal to the average energy of the filtered noise. This filter, while somewhat effective in channels with low noise, does not have any built-in method to counteract noise. In fact, at spots where the transfer function H is close to 0, this filter can drastically amplify noise. This leads to the next filter, which has a built in mechanism to counteract noise. <br>
 
 The mathematically optimal filter given enough information is the Wiener filter, defined as 
 
@@ -80,7 +92,7 @@ $$
 \sum_{n} \left|\hat{x}[n] - x[n]\right|^{2}
 $$
 
-Dividng by the sample length $N$ and applying Parseval's theorem, this is equivalent to minimizing
+Applying Parseval's theorem, this is equivalent to minimizing
 
 $$
 \frac{1}{N}\sum_{k} \left|FY - X\right|^{2} 
@@ -114,9 +126,9 @@ The filter $F$ can be broken down into a complex number $a + bi$. To find the mi
 
 $$
 \begin{gathered}
-J = (a^{2} + b^{2})S_{yy} - (a - bi)S_{xy}^{\ast} - (a + bi)S_{xy} + S_{xx}\\
-\frac{\partial J}{\partial a} = 2aS_{yy} - S_{xy}^{\ast} - S_{xy} = 0\\
-\frac{\partial J}{\partial b} = 2bS_{yy} + iS_{xy}^{\ast} - i S_{xy} = 0
+J = (a^{2} + b^{2})S_{yy} - (a - bi)S_{xy} - (a + bi)S_{xy}^{\ast} + S_{xx}\\
+\frac{\partial J}{\partial a} = 2aS_{yy} - S_{xy} - S_{xy}^{\ast} = 0\\
+\frac{\partial J}{\partial b} = 2bS_{yy} + iS_{xy} - iS_{xy}^{\ast} = 0
 \end{gathered}
 $$
 

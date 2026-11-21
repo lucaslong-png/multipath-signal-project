@@ -183,4 +183,7 @@ def PSD(x, extra = 0, domain="time"):
         print("invalid domain")
         return
     return np.array([xhat[0], np.abs(xhat[1]) ** 2 / len(xhat[0])]).real
+
+def truncate(x, length):
+    return x.T[:length].T
     
