@@ -114,9 +114,9 @@ The filter F can be broken down into a complex number a + bi. To find the minimu
 
 $$
 \begin{gathered}
-J = (a^{2} + b^{2})S_{yy} - (a - bi)S_{xy}^{*} - (a + bi)S_{xy} + S_{xx}\\
-\frac{\partial J}{\partial a} = 2aS_{yy} - S_{xy}^{*} - S_{xy} = 0\\
-\frac{\partial J}{\partial b} = 2bS_{yy} + iS_{xy}^{*} - i S_{xy} = 0
+J = (a^{2} + b^{2})S_{yy} - (a - bi)S_{xy}^{\ast} - (a + bi)S_{xy} + S_{xx}\\
+\frac{\partial J}{\partial a} = 2aS_{yy} - S_{xy}^{\ast} - S_{xy} = 0\\
+\frac{\partial J}{\partial b} = 2bS_{yy} + iS_{xy}^{\ast} - i S_{xy} = 0
 \end{gathered}
 $$
 
@@ -136,7 +136,7 @@ $$
 S_{xy} = E[XY^{\ast}] = E[X(H^{\ast}X^{\ast} + I^{\ast})] = E[H^{\ast}|X|^{2}] + E[XI^{\ast}]
 $$
 
-Because the noise is assumed to be completely independent of the signal, $E[XI^{*}] = 0$. Because $H$ is independent of the expected value, $E[H^{*}|X|^{2}] = H^{*}E[|X|^{2}] = H^{*}S_{xx}$. Therefore, the filter F can be expressed as:
+Because the noise is assumed to be completely independent of the signal, $E[XI^{\ast}] = 0$. Because $H$ is independent of the expected value, $E[H^{\ast}|X|^{2}] = H^{\ast}E[|X|^{2}] = H^{\ast}S_{xx}$. Therefore, the filter F can be expressed as:
 
 $$
 F = \frac{H^{*}S_{xx}}{S_{yy}}
@@ -146,7 +146,7 @@ But since $S_{xy}$ is expressed in terms of the input, we might as well express 
 
 $$
 \begin{gathered}
-S_{yy} = E[|Y|^{2}] = E[(HX + I)(HX + I)^{*}] = |H|^{2}E[|X|^{2}] + HE[XI^{*}] + H^{*}E[X^{*}I] + E[|I|^{2}]\\
+S_{yy} = E[|Y|^{2}] = E[(HX + I)(HX + I)^{\ast}] = |H|^{2}E[|X|^{2}] + HE[XI^{\ast}] + H^{\ast}E[X^{\ast}I] + E[|I|^{2}]\\
 = |H|^{2}S_{xx} + S_{ii}
 \end{gathered}
 $$
