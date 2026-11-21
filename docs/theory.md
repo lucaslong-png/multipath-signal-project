@@ -95,7 +95,7 @@ $$
 Let this be $J(F)$. Expanding the expected value, we get
 
 $$
-J(F) = E[|FY - X|^{2}] = E[(FY - X)(FY - X)^{\ast}] = |F|^{2}E[|Y|^{2}] - FE[X^{\ast}Y] - F^{*}E[XY^{\ast}] + E[|X|^{2}]
+J(F) = E[|FY - X|^{2}] = E[(FY - X)(FY - X)^{\ast}] = |F|^{2}E[|Y|^{2}] - FE[X^{\ast}Y] - F^{\ast}E[XY^{\ast}] + E[|X|^{2}]
 $$
 
 For simplicity, we define the power spectral densities:
@@ -107,7 +107,7 @@ $$
 S_{xx} and S_{yy} are a measure of where power is distributed among the signal, while S_{xy} is a measure of correlation (or an inner product). Because F is independent of the expected value, this turns into
 
 $$
-J = |F|^{2}S_{yy} - F^{*}S_{xy} - FS_{xy}^{*} + S_{xx}
+J = |F|^{2}S_{yy} - F^{\ast}S_{xy} - FS_{xy}^{\ast} + S_{xx}
 $$
 
 The filter F can be broken down into a complex number a + bi. To find the minimum of J, we differentiate with respect to each complex component and set the derivatives equal to 0:
@@ -133,7 +133,7 @@ $$
 This is a valid stopping point, as both $S_{xy}$ and $S_{yy}$ can be estimated from provided information. However, estimating S_{xy} uses information about the PSD of x, and so we can simplify this expression by solving for $S_{xy}$: 
 
 $$
-S_{xy} = E[XY^{*}] = E[X(H^{*}X^{*} + I^{*})] = E[H^{*}|X|^{2}] + E[XI^{*}]
+S_{xy} = E[XY^{\ast}] = E[X(H^{\ast}X^{\ast} + I^{\ast})] = E[H^{\ast}|X|^{2}] + E[XI^{\ast}]
 $$
 
 Because the noise is assumed to be completely independent of the signal, $E[XI^{*}] = 0$. Because $H$ is independent of the expected value, $E[H^{*}|X|^{2}] = H^{*}E[|X|^{2}] = H^{*}S_{xx}$. Therefore, the filter F can be expressed as:
