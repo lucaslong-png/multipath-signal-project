@@ -21,13 +21,13 @@ y[n] = \sum_{k}x[k]h[n-k]
 Y(e^{j\Omega}) = X(e^{j\Omega})H(e^{j\Omega})
 $$
 
-One problem arising with this representation is that I am using a discrete variable n and a continuous variable $\Omega$. This can be circumvented by using the *discrete* fourier transform (DFT) instead of the *discrete time* fourier transform. This essentially samples the frequency grid at N equally spaced points, where N is the DT domain size. This means that $\Omega$ is now a discrete variable instead of a continuous variable, and the inverse DFT is defined as
+One problem arising with this representation is that I am using a discrete variable n and a continuous variable $\Omega$. This can be circumvented by using the *discrete* fourier transform (DFT) instead of the *discrete time* fourier transform. This essentially samples the frequency grid at N equally spaced points, where N is the DT domain size. This means that $\Omega$ is now a discrete variable indexed at spacing $\frac{2\pi}{N}$ instead of a continuous variable, and the inverse DFT is defined as
 
 $$
-x[n] = \frac{1}{N}\sum_{\Omega} X(e^{j\Omega})e^{jn\Omega} 
+x[n] = \frac{1}{N}\sum_{k} X[k]e^\frac{jkn}{2\pi} 
 $$
 
-The DFT assumes finite domain or periodic signals, so some problems related to the convolution theorem arise later that make implementation more complicated in discrete time.
+Where $\Omega = \frac{2\pi k}{N}$.  The DFT assumes finite domain or periodic signals, so some problems related to the convolution theorem arise later that make implementation more complicated in discrete time.
 
 # Systems, filters, and convolution <br> 
 A system is essentially an operator that takes an input x to an output y, while a filter is a type of system that is designed to extract something (i.e. recover x from y). These operators can be represented with a time domain function h (impulse response) or its fourier transform, a frequency domain function H (transfer function). The time domain and frequency domain input-output relationships for LTI systems are:
@@ -44,7 +44,7 @@ $$
 y = h \ast x + i \text{ and } Y = HX + I
 $$
 
-My goal is to find a filter F such that $\hat{x}$ = $\mathcal{F}^{-1}\{FY\}$ minimizes the following sum: 
+My goal is to find a filter F such that $\hat{x}$ = $\mathcal{F}^{-1}\lbrace FY\rbrace$ minimizes the following sum: 
 
 $$
 \sum_{n} \left|\hat{x} - x\right|^{2}
@@ -63,7 +63,7 @@ $$
 and 
 
 $$
-\hat{x} = \mathcal{F}^{-1}\{X + \frac{I}{H}\}
+\hat{x} = \mathcal{F}^{-1}\lbrace X + \frac{I}{H}\rbrace
 $$
 
 This filter, while somewhat effective in channels with low noise, does not have any built-in method to counteract noise. In fact, at spots where the transfer function H is close to 0, this filter can drastically amplify noise. This leads to the next filter, which has a built in mechanism to counteract noise. <br>
