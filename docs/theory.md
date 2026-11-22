@@ -169,5 +169,6 @@ $$
 F = \frac{H^{\ast}S_{xx}}{\left|H\right|^{2}S_{xx} + S_{ii}}
 $$
 
-To achieve optimal accuracy I would need both the signal PSD and the noise PSD. The noise PSD can generally be estimated with statistical knowledge of the noise, but estimating the signal PSD is difficult without knowledge of the signal. In my simulation I pass the exact signal PSD so that I can test the accuracy of my other filters against the true least squares solution.
+To achieve optimal accuracy I would need both the signal PSD and the noise PSD. The noise PSD can generally be estimated with statistical knowledge of the noise, but estimating the signal PSD is difficult without knowledge of the signal. In my simulation I pass the exact signal PSD so that I can test the accuracy of my other filters against the true least squares solution. <p>
 
+This filter and the inverse filter run into an interesting accuracy issue: since it is difficult to predict the time domain
