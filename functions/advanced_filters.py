@@ -89,11 +89,11 @@ def wiener_filter_tf(freq, x, noise_type, noise_params, system, system_params):
     denominator = combine(H_power, divide(nPSD, xPSD))
     return divide(numerator, denominator)
 
-def apply(x, op, params, freq_length=1):
+def apply(x, op, params, freq_length=0):
     #if freq_length is None:
-        #freq_length = len(x[0])
+        #freq_length = len(x[0]) - 1
     if op.__name__.endswith("tf"):
-        x = zero_pad(x, freq_length - 1)
+        x = zero_pad(x, freq_length)
         xhat = dft(x)
         freq = xhat[0]
         yhat = multiply(xhat, op(*([freq] + params)))

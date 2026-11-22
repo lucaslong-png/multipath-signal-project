@@ -1,12 +1,3 @@
-# multipath-signal-project
-This python personal project is a digital signal processing simulation. Signals are modeled as a 2 x N NumPy array, with the first array being a set of discrete time inputs and the second array being the resulting signal value. 
+This python project is focused on discrete time (DT) signals. Given a signal x, impulse response h, and noise n, the output y is determined by y = x ∗ h + n, or equivalently Y = XH + N, where capital letters indicate fourier transforms. For the purposes of this project, impulse responses are a sum of scaled and shifted delta functions, simulating a multipath channel, and noise is randomly generated from a given probability distribution. The goal of this project is to best reconstruct x from a filter when given information about y, h, n, and sometimes x itself. In other words, find a filter that minimizes the squared error between $\hat{x}$ = $\mathcal{F}^{-1}\{FY\}$ and x. This simulates attempting to reconstruct a signal passing through a real life multipath channel with some noise. 
 
-Signals can be operated on with functions in signal_operations.py, including but not limited to fourier transforming, zero-padding, and finding the impulse response. All functions are custom built to account for this structure and keep all frequency units to be in radians.
-
-Noise and interference types are implemented in noise_interference.py and can be applied to signals both independently and with others.
-
-Filter types are implemented in filters.py and are used to filter/change signals in the input or the output to be able to bypass types of noise and interference. Filters also has apply(), which applies a system or filter to a signal. This allows me to use both impulse response and frequency response representations in my code rather than sticking to one.
-
-Results so far:
-low noise levels: inverse filter MSE < wiener filter MSE
-high noise levels: wiener filter MSE << inverse filter MSE
+For this project, I am required to navigate between both the time and frequency domains consistently. This is because while multipath channels are most easily built in the time domain, most filters respond to the frequency domain representation of a signal, and so I have to be flexible and be able to use both. This causes a somewhat large problem: because I am using finite discrete time representations, multiplying two fourier transforms and then inverting produces circular convolution instead of linear convolution. Circular convolution means that the signal "wraps around" the endpoint in the convolution, which doesn't happen in real life for aperiodic signals because they don't have an endpoint. A solution for this is explained in theory.md

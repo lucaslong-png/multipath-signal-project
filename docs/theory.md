@@ -36,7 +36,7 @@ $$
 y = h * x \text{ and } Y = HX
 $$
 
-By the convolution theorem. However, when taking the DFT instead of the DTFT, the convolution theorem applies for *circular* (wrap around) convolution instead of *linear* convolution. One way to circumvent this for signals that diminish over time ($\lim_{n \to \infty} x[n] = 0$) is to *zero pad* the representation, or extend the domain by adding trailing zeros. Because I am modeling finite aperiodic signals with an infinite domain, this does nothing to the accuracy of the representation, but it reduces the overlap produced from the signal's tail. This means that for finite signals it is always possible to zero pad to exactly match linear convolution while for infinite but decreasing signals I can get a better and better approximation by zero padding. <br>
+By the convolution theorem. However, when taking the DFT instead of the DTFT, the convolution theorem applies for *circular* (wrap around) convolution instead of *linear* convolution. One way to circumvent this for signals that diminish over time ($\lim_{n \to \infty} x[n] = 0$) is to *zero pad* the representation, or extend the domain by adding trailing zeros. Because I am modeling finite aperiodic signals with an infinite domain, this does nothing to the accuracy of the representation, but it reduces the overlap produced from the signal's tail. This means that for finite impulse responses it is always possible to zero pad the signal to exactly match linear convolution while for infinite but decreasing signals I can get a better and better approximation by zero padding. <br>
 
 In my project I add noise/interference to the output of the system to simulate a real life environment, meaning that the new input-output relationships become:
 
