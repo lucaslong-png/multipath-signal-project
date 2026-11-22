@@ -29,16 +29,16 @@ for i in range(1, 10):
     x1 = np.array([time1, values1])
     y = apply(x1, multipath_channel, [dslist])
     sdzpl = []
+    system_params = [dslist]
 
     for sd in sd_values:
         min = 0
         minzp = 0
         mbl = 0 
         dif = 0
+        noise_params = [sd]
+        y1 = apply_with_noise(x1, system, system_params, noise_type, noise_params, 14)
         for zpl in zp_lengths:
-            system_params = [dslist]
-            noise_params = [sd]
-            y1 = apply_with_noise(x1, system, system_params, noise_type, noise_params, 14)
             wf_params = [x1, noise_type, noise_params, multipath_channel, system_params]
             reconstruction = truncate(apply(y1, wiener_filter_tf, wf_params, zpl), length)
             #print("noise SD and zeropad length: ", sd, zpl)
