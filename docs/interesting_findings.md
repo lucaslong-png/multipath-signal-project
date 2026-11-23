@@ -2,4 +2,5 @@ Note: this file is not polished, for now it is just used to document all notewor
 
 -At noise SD around equal to signal range, wiener filter is around an order of magnitude more effective than the inverse filter and BGD
 -At noise SD > 10% of range, Wiener filter achieves best accuracy at zero pad lengths less than or equal to the signal length. Error from setting the zero pad length to the signal length averages to less than 10% greater than the minimum error in that interval. The exact error depends on the signal length itself.
+-Inverse filter has interesting behavior for zero pad lengths. It seems to scale with delay size, and it is consistently hitting certain values for minimum error for large delays and scales. More testing needs to be done on this.
 -inverse filter and bgd have very similar errors
